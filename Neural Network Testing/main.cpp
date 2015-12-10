@@ -271,6 +271,12 @@ vector<vector<double>> backPropLearning(vector<vector<double>> examples, vector<
                 }
             }
             
+            float overallAccuracy, precision, recall, f1;
+            
+            overallAccuracy = (A+D)/(A+B+C+D);
+            precision = A/(A+B);
+            recall = A/(A+C);
+            F1 = (2*precision*recall)/(precision+recall); //will have a value in between the precision and recall, closer to the lower of the two
             
             
         }
@@ -282,6 +288,8 @@ vector<vector<double>> backPropLearning(vector<vector<double>> examples, vector<
 
 void writeNetworkToFile(string name, vector<vector<double>> network){
     ofstream myfile;
+    
+    
     myfile.open (name);
     if (myfile.is_open())
     {
