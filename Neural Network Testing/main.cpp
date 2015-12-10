@@ -247,6 +247,18 @@ vector<vector<double>> backPropLearning(vector<vector<double>> examples, vector<
                 top[j] = result;
             }
             
+            for (int j = 0; j < outputNodes; j++){
+                //the activation of output nodes should be rounded to 1 or 0
+                double actualOutput = (applyActivFunct(top[j]) >= 0.5) ? 1 : 0;
+            
+                //compare the actual output with the expected output from the training set(examples)
+                double expectedOutput = examples[numTrainingExamples+i][j];
+                if (actualOutput == expectedOutput){
+                    
+                }
+            }
+            
+            
             
         }
         loop++;
