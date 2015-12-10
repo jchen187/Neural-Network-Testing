@@ -54,7 +54,8 @@ int main(int argc, const char * argv[]) {
     cout << "Please enter the file containing the neural network\n";
     //read the file
     //    cin >> file1;
-    file1 = "1neuralNetwork.txt";
+//    file1 = "1neuralNetwork.txt";
+    file1 = "2gradesNN.txt";
     readFromFile1(file1);
     
     network.reserve( weightsToHidden.size() + weightsToOutput.size() ); // preallocate memory
@@ -64,7 +65,8 @@ int main(int argc, const char * argv[]) {
     cout << "Please enter the file containing the test set.\n";
     //    cin >> file2;
     //    readFromFile2(file2);
-    file2 = "1testingExamples.txt";
+//    file2 = "1testingExamples.txt";
+    file2 = "2gradesTrainingExamples.txt";
     readFromFile2(file2);
     
     examples.reserve( exampleInputs.size() + exampleOutputs.size() ); // preallocate memory
@@ -72,7 +74,9 @@ int main(int argc, const char * argv[]) {
     examples.insert( examples.end(), exampleOutputs.begin(), exampleOutputs.end() );
     
     cout << "Where would you like to output the results to?\n";
-    file3 = "1compareToTestResults.txt";
+//    cin << file3;
+//    file3 = "1compareToTestResults.txt";
+    file3 = "2compareToGradesResults.txt";
     
     cout << "Choose epoch.\n";
     //    cin >> epoch;
@@ -80,7 +84,8 @@ int main(int argc, const char * argv[]) {
     
     cout << "Choose learning rate.\n";
     //    cin >> learningRate;
-    learningRate = 0.1;
+//    learningRate = 0.1;
+    learningRate = 0.05;
     
     A.resize(outputNodes);
     B.resize(outputNodes);
@@ -359,7 +364,9 @@ void writeMetricsToFile(string name){
         for (int i = 0; i < outputNodes + 2; i++){
             if (i < outputNodes){
                 
-                myfile << A[i] << " " << B[i] << " " << C[i] << " " << D[i] << " ";
+                //the two ways below work. you can cast the doubles to ints or just use seetprecision to not show the trailing 0s
+                myfile << (int)A[i] << " " << (int)B[i] << " " << (int)C[i] << " " << (int)D[i] << " ";
+                //myfile << fixed << setprecision(0) << A[i] << " " << B[i] << " " << C[i] << " " << D[i] << " ";
                 
                 //metrics from ABCD
                 myfile << fixed << setprecision(3) <<overallAccuracy[i] << " " << precision[i] << " " << recall[i] << " " << f1[i];
