@@ -16,6 +16,9 @@ using namespace std;
 
 string file1, file2, file3;
 
+double microA = 0, microB = 0, microC = 0, microD = 0;
+double microOverallAccuracy = 0, microPrecision = 0, microRecall = 0, microf1 = 0;
+
 //from the first file
 int inputNodes, hiddenNodes, outputNodes;
 vector<vector<double>> weightsToHidden;
@@ -198,10 +201,7 @@ vector<vector<double>> backPropLearning(vector<vector<double>> examples, vector<
     errors.resize(2);
     errors[0].resize(outputNodes);
     errors[1].resize(hiddenNodes);
-    
-    //vector<float>
-    float microA, microB, microC, microD;
-    
+        
     int loop = 0;
     
     while (loop < epoch){
@@ -280,12 +280,12 @@ vector<vector<double>> backPropLearning(vector<vector<double>> examples, vector<
         loop++;
     }
     
-    float overallAccuracy, precision, recall, f1;
     
-    overallAccuracy = (microA+microD)/(microA+microB+microC+microD);
-    precision = microA/(microA+microB);
-    recall = microA/(microA+microC);
-    f1 = (2*precision*recall)/(precision+recall); //will have a value in between the precision and recall, closer to the lower of the two
+    
+    microOverallAccuracy = (microA+microD)/(microA+microB+microC+microD);
+    microPrecision = microA/(microA+microB);
+    microRecall = microA/(microA+microC);
+    microf1 = (2*microPrecision*microRecall)/(microPrecision+microRecall); //will have a value in between the microPrecision and microRecall, closer to the lower of the two
     
     return network;
 }
