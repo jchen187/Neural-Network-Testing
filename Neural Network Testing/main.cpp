@@ -43,7 +43,7 @@ int main(int argc, const char * argv[]) {
     cout << "Please enter the file containing the neural network\n";
     //read the file
     //    cin >> file1;
-    file1 = "initialNN.txt";
+    file1 = "1neuralNetwork.txt";
     readFromFile1(file1);
     
     network.reserve( weightsToHidden.size() + weightsToOutput.size() ); // preallocate memory
@@ -53,7 +53,7 @@ int main(int argc, const char * argv[]) {
     cout << "Please enter the file containing the test set.\n";
     //    cin >> file2;
     //    readFromFile2(file2);
-    file2 = "train.txt";
+    file2 = "1testingExamples.txt";
     readFromFile2(file2);
     
     examples.reserve( exampleInputs.size() + exampleOutputs.size() ); // preallocate memory
@@ -61,7 +61,7 @@ int main(int argc, const char * argv[]) {
     examples.insert( examples.end(), exampleOutputs.begin(), exampleOutputs.end() );
     
     cout << "Where would you like to output the results to?\n";
-    file3 = "compareToTrainNN.txt";
+    file3 = "1compareToTestResults.txt";
     
     cout << "Choose epoch.\n";
     //    cin >> epoch;
@@ -73,7 +73,6 @@ int main(int argc, const char * argv[]) {
     
     vector<vector<double>> newNetwork = backPropLearning(examples, network);
     writeNetworkToFile(file3, newNetwork);
-    //    writeNetworkToFile("t.txt", network);
     
     return 0;
 }
@@ -276,7 +275,7 @@ vector<vector<double>> backPropLearning(vector<vector<double>> examples, vector<
             overallAccuracy = (A+D)/(A+B+C+D);
             precision = A/(A+B);
             recall = A/(A+C);
-            F1 = (2*precision*recall)/(precision+recall); //will have a value in between the precision and recall, closer to the lower of the two
+            f1 = (2*precision*recall)/(precision+recall); //will have a value in between the precision and recall, closer to the lower of the two
             
             
         }
