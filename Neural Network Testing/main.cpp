@@ -16,8 +16,16 @@ using namespace std;
 
 string file1, file2, file3;
 
-double microA = 0, microB = 0, microC = 0, microD = 0;
-double microOverallAccuracy = 0, microPrecision = 0, microRecall = 0, microf1 = 0;
+//double microA = 0, microB = 0, microC = 0, microD = 0;
+//double overallAccuracy = 0, precision = 0, recall = 0, f1 = 0;
+
+//each output will have their own A,B,C,D, accurary ...
+vector<double> A, B, C, D;
+vector<double> overallAccuracy, precision, recall, f1;
+
+
+double microAccuracy, microPrecision, microRecall, microf1;
+double macroAccuracy, macroPrecision, macroRecall, macrof1;
 
 //from the first file
 int inputNodes, hiddenNodes, outputNodes;
@@ -73,6 +81,16 @@ int main(int argc, const char * argv[]) {
     cout << "Choose learning rate.\n";
     //    cin >> learningRate;
     learningRate = 0.1;
+    
+    A.resize(outputNodes);
+    B.resize(outputNodes);
+    C.resize(outputNodes);
+    D.resize(outputNodes);
+
+    overallAccuracy.resize(outputNodes);
+    precision.resize(outputNodes);
+    recall.resize(outputNodes);
+    f1.resize(outputNodes);
     
     calculateMetrics(examples, network);
     writeMetricsToFile(file3);
@@ -256,21 +274,33 @@ void calculateMetrics(vector<vector<double>> examples, vector<vector<double>> ne
                 cout << "actual: " << actualOutput;
                 //compare the actual output with the expected output from the training set(examples)
                 double expectedOutput = examples[numTrainingExamples+i][j];
-                cout << " expected: " << expectedOutput << "\n";
+                cout << " expected: " << expectedOutput;
+                if (actualOutput != expectedOutput){
+                    cout << "not equal";
+                }
+                cout << "\n";
+                
                 
                 //based on the contingency table
                 if (actualOutput == 1 && expectedOutput == 1){
-                    microA++;
+                    A[j]++;
                 }
                 else if (actualOutput == 1 && expectedOutput == 0){
-                    microB++;
+                    B[j]++;
                 }
                 else if (actualOutput == 0 && expectedOutput == 1){
-                    microC++;
+                    C[j]++;
                 }
                 else if (actualOutput == 0 && expectedOutput == 0){
-                    microD++;
+                    D[j]++;
                 }
+            }
+            
+            for (int j = 0; j < outputNodes; j++){
+                overallAccuracy[j] = (A[j]+D[j])/(A[j]+B[j]+C[j]+D[j]);
+                precision[j] = A[j]/(A[j]+B[j]);
+                recall[j] = A[j]/(A[j]+C[j]);
+                f1[j] = (2*precision[j]*recall[j])/(precision[j]+recall[j]);
             }
             
             
@@ -280,16 +310,43 @@ void calculateMetrics(vector<vector<double>> examples, vector<vector<double>> ne
         loop++;
     }
     
+    //MICRO
+    double totalA, totalB, totalC, totalD;
+    //add up all As/output
+    for (int i = 0; i < outputNodes;i++){
+        totalA += A[i];
+        totalB += B[i];
+        totalC += C[i];
+        totalD += D[i];
+    }
+    microAccuracy = (totalA+totalD)/(totalA+totalB+totalC+totalD);
+    microPrecision = totalA/(totalA+totalB);
+    microRecall = totalA/(totalA+totalC);
+    microf1 = (2*microPrecision*microRecall)/(microPrecision+microRecall);
+    
+    //MACRO
+    //add up all the Accuracy/outputNode to get micro
+    for (int i = 0; i < outputNodes; i++){
+        macroAccuracy += overallAccuracy[i];
+        macroPrecision += precision[i];
+        macroRecall += recall[i];
+        macrof1 += f1[i];
+    }
+    macroAccuracy /= outputNodes;
+    macroPrecision /= outputNodes;
+    macroRecall /= outputNodes;
+    macrof1 /= outputNodes;
     
     
-    microOverallAccuracy = (microA+microD)/(microA+microB+microC+microD);
-    microPrecision = microA/(microA+microB);
-    microRecall = microA/(microA+microC);
-    microf1 = (2*microPrecision*microRecall)/(microPrecision+microRecall); //will have a value in between the microPrecision and microRecall, closer to the lower of the two
-    cout << microOverallAccuracy << endl;
-    cout << microPrecision << endl;
-    cout << microRecall << endl;;
-    cout << microf1 << endl;
+
+
+    
+    //will have a value in between the microPrecision and microRecall, closer to the lower of the two
+
+//    cout << overallAccuracy << endl;
+//    cout << precision << endl;
+//    cout << recall << endl;;
+//    cout << f1 << endl;
     
 }
 
@@ -300,14 +357,20 @@ void writeMetricsToFile(string name){
     if (myfile.is_open())
     {
         for (int i = 0; i < outputNodes + 2; i++){
-            if (i == 0){
-                myfile << microA << " " << microB << " " << microC << " " << microD;
-            }
-            else if (i == 1){
-                myfile << fixed << setprecision(3) <<microOverallAccuracy << " " << microPrecision << " " << microRecall << " " << microf1;
-            }
-            else if (i == 2){
+            if (i < outputNodes){
                 
+                myfile << A[i] << " " << B[i] << " " << C[i] << " " << D[i] << " ";
+                
+                //metrics from ABCD
+                myfile << fixed << setprecision(3) <<overallAccuracy[i] << " " << precision[i] << " " << recall[i] << " " << f1[i];
+            }
+            else if (i == outputNodes){
+                //micro
+                myfile << fixed << setprecision(3) << microAccuracy << " " << microPrecision << " " << microRecall << " " << microf1;
+            }
+            else if (i == outputNodes + 1){
+                //macro
+                myfile << fixed << setprecision(3) << macroAccuracy << " " << macroPrecision << " " << macroRecall << " " << macrof1;
             }
        
             myfile << "\n";
