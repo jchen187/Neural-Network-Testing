@@ -199,6 +199,9 @@ vector<vector<double>> backPropLearning(vector<vector<double>> examples, vector<
     errors[0].resize(outputNodes);
     errors[1].resize(hiddenNodes);
     
+    //vector<float>
+    float microA, microB, microC, microD;
+    
     int loop = 0;
     
     while (loop < epoch){
@@ -246,41 +249,43 @@ vector<vector<double>> backPropLearning(vector<vector<double>> examples, vector<
                 top[j] = result;
             }
             
-            float A, B, C, D;
             
             for (int j = 0; j < outputNodes; j++){
                 //the activation of output nodes should be rounded to 1 or 0
                 double actualOutput = (applyActivFunct(top[j]) >= 0.5) ? 1 : 0;
-            
+                cout << "actual: " << actualOutput;
                 //compare the actual output with the expected output from the training set(examples)
                 double expectedOutput = examples[numTrainingExamples+i][j];
+                cout << " expected: " << expectedOutput << "\n";
                 
                 //based on the contingency table
                 if (actualOutput == 1 && expectedOutput == 1){
-                    A++;
+                    microA++;
                 }
                 else if (actualOutput == 1 && expectedOutput == 0){
-                    B++;
+                    microB++;
                 }
                 else if (actualOutput == 0 && expectedOutput == 1){
-                    C++;
+                    microC++;
                 }
                 else if (actualOutput == 0 && expectedOutput == 0){
-                    D++;
+                    microD++;
                 }
             }
             
-            float overallAccuracy, precision, recall, f1;
             
-            overallAccuracy = (A+D)/(A+B+C+D);
-            precision = A/(A+B);
-            recall = A/(A+C);
-            f1 = (2*precision*recall)/(precision+recall); //will have a value in between the precision and recall, closer to the lower of the two
             
             
         }
         loop++;
     }
+    
+    float overallAccuracy, precision, recall, f1;
+    
+    overallAccuracy = (microA+microD)/(microA+microB+microC+microD);
+    precision = microA/(microA+microB);
+    recall = microA/(microA+microC);
+    f1 = (2*precision*recall)/(precision+recall); //will have a value in between the precision and recall, closer to the lower of the two
     
     return network;
 }
