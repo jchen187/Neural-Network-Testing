@@ -247,14 +247,27 @@ vector<vector<double>> backPropLearning(vector<vector<double>> examples, vector<
                 top[j] = result;
             }
             
+            float A, B, C, D;
+            
             for (int j = 0; j < outputNodes; j++){
                 //the activation of output nodes should be rounded to 1 or 0
                 double actualOutput = (applyActivFunct(top[j]) >= 0.5) ? 1 : 0;
             
                 //compare the actual output with the expected output from the training set(examples)
                 double expectedOutput = examples[numTrainingExamples+i][j];
-                if (actualOutput == expectedOutput){
-                    
+                
+                //based on the contingency table
+                if (actualOutput == 1 && expectedOutput == 1){
+                    A++;
+                }
+                else if (actualOutput == 1 && expectedOutput == 0){
+                    B++;
+                }
+                else if (actualOutput == 0 && expectedOutput == 1){
+                    C++;
+                }
+                else if (actualOutput == 0 && expectedOutput == 0){
+                    D++;
                 }
             }
             
