@@ -37,9 +37,9 @@ double learningRate;
 
 void readFromFile1(string name);
 void readFromFile2(string name);
-void writeNetworkToFile(string name, vector<vector<double>> network);
+void writeMetricsToFile(string name);
 
-vector<vector<double>> backPropLearning(vector<vector<double>> examples, vector<vector<double>> network);
+void calculateMetrics(vector<vector<double>> examples, vector<vector<double>> network);
 
 int main(int argc, const char * argv[]) {
     
@@ -74,8 +74,8 @@ int main(int argc, const char * argv[]) {
     //    cin >> learningRate;
     learningRate = 0.1;
     
-    vector<vector<double>> newNetwork = backPropLearning(examples, network);
-    writeNetworkToFile(file3, newNetwork);
+    calculateMetrics(examples, network);
+    writeMetricsToFile(file3);
     
     return 0;
 }
@@ -194,7 +194,7 @@ double applyDerivActivFunct(double x){
 
 //given return a neural network and the examples, return a neural network
 //examples include both input and output examples. same with network. contains first weight from input to hidden node, then hidden node to output
-vector<vector<double>> backPropLearning(vector<vector<double>> examples, vector<vector<double>> network){
+void calculateMetrics(vector<vector<double>> examples, vector<vector<double>> network){
     
     //error for both outlayer and hiddenlayer
     vector<vector<double>> errors;
@@ -286,33 +286,30 @@ vector<vector<double>> backPropLearning(vector<vector<double>> examples, vector<
     microPrecision = microA/(microA+microB);
     microRecall = microA/(microA+microC);
     microf1 = (2*microPrecision*microRecall)/(microPrecision+microRecall); //will have a value in between the microPrecision and microRecall, closer to the lower of the two
+    cout << microOverallAccuracy << endl;
+    cout << microPrecision << endl;
+    cout << microRecall << endl;;
+    cout << microf1 << endl;
     
-    return network;
 }
 
-void writeNetworkToFile(string name, vector<vector<double>> network){
+void writeMetricsToFile(string name){
     ofstream myfile;
-    
     
     myfile.open (name);
     if (myfile.is_open())
     {
-        myfile << inputNodes << " " << hiddenNodes << " " << outputNodes << "\n";
-        
-        //size is hidden + output
-        for (int i = 0; i < hiddenNodes; i++){
-            //            myfile << "This is another line.\n";
-            for (int j = 0; j < inputNodes + 1; j++){
-                myfile << fixed << setprecision(3) << network[i][j] << " ";
-                //ceil(num*pow(10,x))/pow(10,x)
+        for (int i = 0; i < outputNodes + 2; i++){
+            if (i == 0){
+                myfile << microA << " " << microB << " " << microC << " " << microD;
+            }
+            else if (i == 1){
+                myfile << fixed << setprecision(3) <<microOverallAccuracy << " " << microPrecision << " " << microRecall << " " << microf1;
+            }
+            else if (i == 2){
                 
             }
-            myfile << "\n";
-        }
-        for (int i = 0; i < outputNodes; i++){
-            for (int j = 0; j < hiddenNodes + 1; j++){
-                myfile << fixed << setprecision(3) << network[hiddenNodes+i][j] << " ";
-            }
+       
             myfile << "\n";
         }
         myfile.close();
