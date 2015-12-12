@@ -273,7 +273,7 @@ void calculateMetrics(vector<vector<double>> examples, vector<vector<double>> ne
             }
             cout << "\n";
             
-            
+            //YOU TAKE THE OUTPUT FROM THE EXAMPLE FILE AND YOU COMPARE WITH THE RESULT YOU GET FROM TAKING THE INPUT AND PROPAGATING IT FORWARD
             //based on the contingency table
             if (actualOutput == 1 && expectedOutput == 1){
                 A[j]++;
