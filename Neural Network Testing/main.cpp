@@ -24,8 +24,8 @@ vector<double> A, B, C, D;
 vector<double> overallAccuracy, precision, recall, f1;
 
 
-double microAccuracy, microPrecision, microRecall, microf1;
-double macroAccuracy, macroPrecision, macroRecall, macrof1;
+double microAccuracy = 0, microPrecision = 0, microRecall = 0, microf1 = 0;
+double macroAccuracy = 0, macroPrecision = 0, macroRecall = 0, macrof1 = 0;
 
 //from the first file
 int inputNodes, hiddenNodes, outputNodes;
@@ -38,10 +38,6 @@ int numTrainingExamples, inputs, outputs;
 vector<vector<double>> exampleInputs;
 vector<vector<double>> exampleOutputs; //0 or 1
 vector<vector<double>> examples;
-
-//user enters this
-int epoch;
-double learningRate;
 
 void readFromFile1(string name);
 void readFromFile2(string name);
@@ -56,6 +52,7 @@ int main(int argc, const char * argv[]) {
     //    cin >> file1;
 //    file1 = "1neuralNetwork.txt";
     file1 = "2gradesNN.txt";
+//    file1 = "MINE_1results.txt";
     readFromFile1(file1);
     
     network.reserve( weightsToHidden.size() + weightsToOutput.size() ); // preallocate memory
@@ -67,6 +64,7 @@ int main(int argc, const char * argv[]) {
     //    readFromFile2(file2);
 //    file2 = "1testingExamples.txt";
     file2 = "2gradesTrainingExamples.txt";
+//    file2 = "MINE_2testExamples.txt";
     readFromFile2(file2);
     
     examples.reserve( exampleInputs.size() + exampleOutputs.size() ); // preallocate memory
@@ -77,15 +75,7 @@ int main(int argc, const char * argv[]) {
 //    cin << file3;
 //    file3 = "1compareToTestResults.txt";
     file3 = "2compareToGradesResults.txt";
-    
-    cout << "Choose epoch.\n";
-    //    cin >> epoch;
-    epoch = 1;
-    
-    cout << "Choose learning rate.\n";
-    //    cin >> learningRate;
-//    learningRate = 0.1;
-    learningRate = 0.05;
+//    file3 = "MINE_2finalResults.txt";
     
     A.resize(outputNodes);
     B.resize(outputNodes);
@@ -225,94 +215,86 @@ void calculateMetrics(vector<vector<double>> examples, vector<vector<double>> ne
     errors[0].resize(outputNodes);
     errors[1].resize(hiddenNodes);
         
-    int loop = 0;
-    
-    while (loop < epoch){
-        //go through each example in examples
-        //you could do numTrainingExamples or you can do the exampleInputs.size()
-        for (int i = 0; i < numTrainingExamples; i++){
-            
-            //base will contain all the example inputs
-            vector<double> base = examples[i];
-            
-            //propagate the inputs forward to compute the outputs
-            vector<double> middle;
-            middle.resize(hiddenNodes);
-            
-            //loop through each hidden node
-            for (int j = 0; j < hiddenNodes; j++){
-                double result = 0;
-                //get contribution from each node from previous layer
-                for (int k = 0; k < inputNodes+1; k++){
-                    //for the first weight, multiply by the fixed input -1
-                    if (k == 0){
-                        result += -1 * network[j][0];
-                    }
-                    else {
-                        //network has the bias weight at the beginning and is ahead of the example/base
-                        result += network[j][k] * base[k-1];
-                    }
+   
+    //go through each example in examples
+    //you could do numTrainingExamples or you can do the exampleInputs.size()
+    for (int i = 0; i < numTrainingExamples; i++){
+        
+        //base will contain all the example inputs
+        vector<double> base = examples[i];
+        
+        //propagate the inputs forward to compute the outputs
+        vector<double> middle;
+        middle.resize(hiddenNodes);
+        
+        //loop through each hidden node
+        for (int j = 0; j < hiddenNodes; j++){
+            double result = 0;
+            //get contribution from each node from previous layer
+            for (int k = 0; k < inputNodes+1; k++){
+                //for the first weight, multiply by the fixed input -1
+                if (k == 0){
+                    result += -1 * network[j][0];
                 }
-                middle[j] = result;
-            }
-            
-            //output
-            vector<double> top;
-            top.resize(outputNodes);
-            for (int j = 0; j < outputNodes; j++){
-                double result = 0;
-                for (int k = 0; k < hiddenNodes+1; k++){
-                    if (k == 0){
-                        result += -1 * network[hiddenNodes+j][0];
-                    }
-                    else {
-                        result += network[hiddenNodes+j][k] * applyActivFunct(middle[k-1]);
-                    }
-                }
-                top[j] = result;
-            }
-            
-            
-            for (int j = 0; j < outputNodes; j++){
-                //the activation of output nodes should be rounded to 1 or 0
-                double actualOutput = (applyActivFunct(top[j]) >= 0.5) ? 1 : 0;
-                cout << "actual: " << actualOutput;
-                //compare the actual output with the expected output from the training set(examples)
-                double expectedOutput = examples[numTrainingExamples+i][j];
-                cout << " expected: " << expectedOutput;
-                if (actualOutput != expectedOutput){
-                    cout << "not equal";
-                }
-                cout << "\n";
-                
-                
-                //based on the contingency table
-                if (actualOutput == 1 && expectedOutput == 1){
-                    A[j]++;
-                }
-                else if (actualOutput == 1 && expectedOutput == 0){
-                    B[j]++;
-                }
-                else if (actualOutput == 0 && expectedOutput == 1){
-                    C[j]++;
-                }
-                else if (actualOutput == 0 && expectedOutput == 0){
-                    D[j]++;
+                else {
+                    //network has the bias weight at the beginning and is ahead of the example/base
+                    result += network[j][k] * base[k-1];
                 }
             }
-            
-            for (int j = 0; j < outputNodes; j++){
-                overallAccuracy[j] = (A[j]+D[j])/(A[j]+B[j]+C[j]+D[j]);
-                precision[j] = A[j]/(A[j]+B[j]);
-                recall[j] = A[j]/(A[j]+C[j]);
-                f1[j] = (2*precision[j]*recall[j])/(precision[j]+recall[j]);
-            }
-            
-            
-            
-            
+            middle[j] = result;
         }
-        loop++;
+        
+        //output
+        vector<double> top;
+        top.resize(outputNodes);
+        for (int j = 0; j < outputNodes; j++){
+            double result = 0;
+            for (int k = 0; k < hiddenNodes+1; k++){
+                if (k == 0){
+                    result += -1 * network[hiddenNodes+j][0];
+                }
+                else {
+                    result += network[hiddenNodes+j][k] * applyActivFunct(middle[k-1]);
+                }
+            }
+            top[j] = result;
+        }
+        
+        
+        for (int j = 0; j < outputNodes; j++){
+            //the activation of output nodes should be rounded to 1 or 0
+            double actualOutput = (applyActivFunct(top[j]) >= 0.5) ? 1 : 0;
+            cout << "actual: " << actualOutput;
+            //compare the actual output with the expected output from the training set(examples)
+            double expectedOutput = examples[numTrainingExamples+i][j];
+            cout << " expected: " << expectedOutput;
+            if (actualOutput != expectedOutput){
+                cout << "not equal";
+            }
+            cout << "\n";
+            
+            
+            //based on the contingency table
+            if (actualOutput == 1 && expectedOutput == 1){
+                A[j]++;
+            }
+            else if (actualOutput == 1 && expectedOutput == 0){
+                B[j]++;
+            }
+            else if (actualOutput == 0 && expectedOutput == 1){
+                C[j]++;
+            }
+            else if (actualOutput == 0 && expectedOutput == 0){
+                D[j]++;
+            }
+        }
+        
+        for (int j = 0; j < outputNodes; j++){
+            overallAccuracy[j] = (A[j]+D[j])/(A[j]+B[j]+C[j]+D[j]);
+            precision[j] = A[j]/(A[j]+B[j]);
+            recall[j] = A[j]/(A[j]+C[j]);
+            f1[j] = (2*precision[j]*recall[j])/(precision[j]+recall[j]);
+        }
     }
     
     //MICRO
@@ -335,12 +317,11 @@ void calculateMetrics(vector<vector<double>> examples, vector<vector<double>> ne
         macroAccuracy += overallAccuracy[i];
         macroPrecision += precision[i];
         macroRecall += recall[i];
-        macrof1 += f1[i];
     }
     macroAccuracy /= outputNodes;
     macroPrecision /= outputNodes;
     macroRecall /= outputNodes;
-    macrof1 /= outputNodes;
+    macrof1 = (2*macroPrecision*macroRecall)/(macroPrecision+macroRecall);
     
     
 
@@ -365,8 +346,8 @@ void writeMetricsToFile(string name){
             if (i < outputNodes){
                 
                 //the two ways below work. you can cast the doubles to ints or just use seetprecision to not show the trailing 0s
-                myfile << (int)A[i] << " " << (int)B[i] << " " << (int)C[i] << " " << (int)D[i] << " ";
-                //myfile << fixed << setprecision(0) << A[i] << " " << B[i] << " " << C[i] << " " << D[i] << " ";
+//                myfile << (int)A[i] << " " << (int)B[i] << " " << (int)C[i] << " " << (int)D[i] << " ";
+                myfile << fixed << setprecision(0) << A[i] << " " << B[i] << " " << C[i] << " " << D[i] << " ";
                 
                 //metrics from ABCD
                 myfile << fixed << setprecision(3) <<overallAccuracy[i] << " " << precision[i] << " " << recall[i] << " " << f1[i];
