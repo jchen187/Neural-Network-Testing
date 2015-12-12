@@ -49,9 +49,9 @@ int main(int argc, const char * argv[]) {
     
     cout << "Please enter the file containing the neural network\n";
     //read the file
-    //    cin >> file1;
+        cin >> file1;
 //    file1 = "1neuralNetwork.txt";
-    file1 = "2gradesNN.txt";
+//    file1 = "2gradesNN.txt";
 //    file1 = "MINE_1results.txt";
     readFromFile1(file1);
     
@@ -60,10 +60,10 @@ int main(int argc, const char * argv[]) {
     network.insert( network.end(), weightsToOutput.begin(), weightsToOutput.end() );
     
     cout << "Please enter the file containing the test set.\n";
-    //    cin >> file2;
+        cin >> file2;
     //    readFromFile2(file2);
 //    file2 = "1testingExamples.txt";
-    file2 = "2gradesTrainingExamples.txt";
+//    file2 = "2gradesTrainingExamples.txt";
 //    file2 = "MINE_2testExamples.txt";
     readFromFile2(file2);
     
@@ -72,9 +72,9 @@ int main(int argc, const char * argv[]) {
     examples.insert( examples.end(), exampleOutputs.begin(), exampleOutputs.end() );
     
     cout << "Where would you like to output the results to?\n";
-//    cin << file3;
+    cin >> file3;
 //    file3 = "1compareToTestResults.txt";
-    file3 = "2compareToGradesResults.txt";
+//    file3 = "2compareToGradesResults.txt";
 //    file3 = "MINE_2finalResults.txt";
     
     A.resize(outputNodes);
@@ -264,14 +264,14 @@ void calculateMetrics(vector<vector<double>> examples, vector<vector<double>> ne
         for (int j = 0; j < outputNodes; j++){
             //the activation of output nodes should be rounded to 1 or 0
             double actualOutput = (applyActivFunct(top[j]) >= 0.5) ? 1 : 0;
-            cout << "actual: " << actualOutput;
+//            cout << "actual: " << actualOutput;
             //compare the actual output with the expected output from the training set(examples)
             double expectedOutput = examples[numTrainingExamples+i][j];
-            cout << " expected: " << expectedOutput;
-            if (actualOutput != expectedOutput){
-                cout << "not equal";
-            }
-            cout << "\n";
+//            cout << " expected: " << expectedOutput;
+//            if (actualOutput != expectedOutput){
+//                cout << "not equal";
+//            }
+//            cout << "\n";
             
             //YOU TAKE THE OUTPUT FROM THE EXAMPLE FILE AND YOU COMPARE WITH THE RESULT YOU GET FROM TAKING THE INPUT AND PROPAGATING IT FORWARD
             //based on the contingency table
